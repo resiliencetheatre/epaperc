@@ -1,0 +1,4 @@
+bin/
+epd
+edgemap-ui
+*.o
