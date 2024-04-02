@@ -101,7 +101,7 @@ int edgemap_message(char *message_text,int delay)
     // Show boot info and qrcode.bmp
 	Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
-    GUI_ReadBmp("/mnt/pic/white.bmp", 0, 0);
+    GUI_ReadBmp("/opt/eink/pic/white.bmp", 0, 0);
     Paint_DrawString_EN(5, 20, message_text, &Font12,WHITE,BLACK);
     EPD_2in13_V3_Display(BlackImage);
     if ( delay > 0 )
