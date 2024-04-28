@@ -62,7 +62,7 @@ int edgemap_bootmsg(void)
     // Show boot info and qrcode.bmp
 	Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
-    GUI_ReadBmp("/mnt/pic/qrcode.bmp", 0, 0);
+    GUI_ReadBmp("/opt/eink/pic/qrcode.bmp", 0, 0);
     Paint_DrawString_EN(5, 5, "Edgemap", &Font20,WHITE, BLACK );
     Paint_DrawString_EN(5, 25, inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr )->sin_addr), &Font12,WHITE, BLACK );
     Paint_DrawString_EN(5, 45, "Full world OSM", &Font12,WHITE, BLACK );
