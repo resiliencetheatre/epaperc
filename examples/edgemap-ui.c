@@ -35,9 +35,11 @@
 #include <net/if.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <netdb.h>
+
 
 //int EPD_2in13_V3_test(void)
-int edgemap_bootmsg(void)
+int edgemap_bootmsg(int auto_erase)
 {
     int n;
     struct ifreq ifr;
@@ -58,29 +60,52 @@ int edgemap_bootmsg(void)
         Debug("Failed to apply for black memory...\r\n");
         return -1;
     }
+    // Get hostname
+    char hostname[1024];
+    memset(hostname,0,1024);
+    if (gethostname(hostname, sizeof(hostname)) == 0) {
+        printf("Hostname: %s\n", hostname);
+    } else {
+        perror("gethostname");
+    }
+    
+    char hostname_entry[200];
+    memset(hostname_entry,0,200);
+    sprintf(hostname_entry,"%s (%s)",inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr )->sin_addr),hostname);
     
     // Show boot info and qrcode.bmp
 	Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
     GUI_ReadBmp("/opt/eink/pic/qrcode.bmp", 0, 0);
-    Paint_DrawString_EN(5, 5, "Edgemap", &Font20,WHITE, BLACK );
-    Paint_DrawString_EN(5, 25, inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr )->sin_addr), &Font12,WHITE, BLACK );
-    Paint_DrawString_EN(5, 45, "Full world OSM", &Font12,WHITE, BLACK );
-    Paint_DrawString_EN(5, 60, "Full world terrain", &Font12,WHITE, BLACK );
-    Paint_DrawString_EN(5, 75, "Imagery:", &Font12,WHITE, BLACK );
-    Paint_DrawString_EN(5, 90, " Kiev,Sevast,KWI City", &Font12,WHITE, BLACK );
-    Paint_DrawString_EN(20, 110, "This page erases after 30 s.", &Font12,WHITE, BLACK );
+    // GUI_ReadBmp("/opt/eink/pic/white.bmp", 0, 0);
+    Paint_DrawString_EN(0, 0, "Edgemap", &Font20,WHITE, BLACK );
+    Paint_DrawString_EN(0, 25, hostname_entry, &Font12,WHITE, BLACK );
+    // Paint_DrawString_EN(5, 30, inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr )->sin_addr), &Font12,WHITE, BLACK );
+    Paint_DrawString_EN(0, 45, "* Full world OSM", &Font12,WHITE, BLACK );
+    Paint_DrawString_EN(0, 60, "* Full world terrain", &Font12,WHITE, BLACK );
+    Paint_DrawString_EN(0, 75, "* Imagery:", &Font12,WHITE, BLACK );
+    Paint_DrawString_EN(0, 90, "  Kiev,Sevast,KWI City", &Font12,WHITE, BLACK );
+    
+    if ( auto_erase ) 
+        Paint_DrawString_EN(20, 110, "This page erases after 30 s.", &Font12,WHITE, BLACK );
+    else
+        Paint_DrawString_EN(0, 105, "* Meshtastic supported", &Font12,WHITE, BLACK );
+        
     EPD_2in13_V3_Display(BlackImage);
-    DEV_Delay_ms(30000);
+    if ( auto_erase ) 
+        DEV_Delay_ms(30000);
     free(BlackImage);
 
-    // Turn display off
-	EPD_2in13_V3_Init();
-    EPD_2in13_V3_Clear();
-    EPD_2in13_V3_Sleep();
-    BlackImage = NULL;
-    DEV_Delay_ms(2000); //important, at least 2s
-    DEV_Module_Exit();
+    if ( auto_erase ) 
+    {
+        // Turn display off
+        EPD_2in13_V3_Init();
+        EPD_2in13_V3_Clear();
+        EPD_2in13_V3_Sleep();
+        BlackImage = NULL;
+        DEV_Delay_ms(2000); //important, at least 2s
+        DEV_Module_Exit();
+    }
     return 0;
 }
 

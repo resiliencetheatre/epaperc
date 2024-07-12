@@ -123,6 +123,6 @@ int EPD_10in2b_test(void);
 int EPD_13in3k_test(void);
 
 int edgemap_message(char *message_text, int delay);
-int edgemap_bootmsg(void);
+int edgemap_bootmsg(int auto_erase);
 
 #endif
